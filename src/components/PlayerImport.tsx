@@ -24,10 +24,8 @@ export function PlayerImport() {
 
         // Process each row and insert into the database
         for (const row of jsonData as any[]) {
-          // Get the team from either Squadra column (there are two in the Excel)
-          const team = row.Squadra || row['Squadra.1'];
-          
-          if (!row.Nome || !team || !row.Ruolo) {
+          // Ora utilizziamo solo la colonna Squadra, ignorando Fantasquadra
+          if (!row.Nome || !row.Squadra || !row.Ruolo) {
             console.error('Missing required data:', row);
             continue;
           }
@@ -36,7 +34,7 @@ export function PlayerImport() {
             .from('players')
             .insert({
               name: row.Nome,
-              team: team,
+              team: row.Squadra,
               role: row.Ruolo,
               starting_price: parseInt(row.Prezzo) || 1,
             });
