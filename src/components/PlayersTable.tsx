@@ -10,27 +10,43 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CheckCircle2, XCircle, ArrowUpDown } from "lucide-react";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { columns } from "@/config/playersTableColumns";
 import { PlayerFilters } from "./PlayerFilters";
 import { leagueConfig } from "@/config/leagueConfig";
+import { PlayerAvatar } from "./PlayerAvatar";
 
 type SortConfig = {
     column: string;
     direction: "asc" | "desc";
 };
 
-const formatPlayerNameForImage = (name: string) => {
-    return name.toUpperCase().replace(/\s+/g, "-").replace(/[.'’]/g, "");
+const renderTableCell = (player: any, column: any) => {
+    switch (column.key) {
+        case "photo":
+            return <PlayerAvatar name={player.name} />;
+        case "fantateam":
+            return (
+                player.fantateam || player.fantasy_team?.name || "Svincolato"
+            );
+        case "out_of_list":
+            return player.out_of_list ? (
+                <CheckCircle2 className="h-4 w-4 text-green-500 mx-auto" />
+            ) : (
+                <XCircle className="h-4 w-4 text-red-500 mx-auto" />
+            );
+        case "average_vote":
+        case "average_fantavote":
+            return player[column.key]?.toFixed(2);
+        case "fantaprice":
+            return `${player[column.key]}M`;
+        case "role":
+            return leagueConfig.system === "classic" ? player.role : null;
+        case "mantra_role":
+            return leagueConfig.system === "mantra" ? player.mantra_role : null;
+        default:
+            return player[column.key];
+    }
 };
 
 export function PlayersTable() {
@@ -66,17 +82,12 @@ export function PlayersTable() {
     };
 
     const filteredAndSortedPlayers = players
-        ?.filter((player) => {
-            const matchesSearch = player.name
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase());
-            const matchesRole =
-                roleFilter === "all" || player.role === roleFilter;
-            const matchesMantraRole =
-                mantraRoleFilter === "all" ||
-                player.mantra_role === mantraRoleFilter;
-            return matchesSearch && matchesRole && matchesMantraRole;
-        })
+        ?.filter(
+            ({ name, role, mantra_role }) =>
+                name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+                (roleFilter === "all" || role === roleFilter) &&
+                (mantraRoleFilter === "all" || mantra_role === mantraRoleFilter)
+        )
         .sort((a, b) => {
             const aValue = a[sortConfig.column as keyof typeof a];
             const bValue = b[sortConfig.column as keyof typeof b];
@@ -87,11 +98,9 @@ export function PlayersTable() {
                     : bValue - aValue;
             }
 
-            const aString = String(aValue || "");
-            const bString = String(bValue || "");
             return sortConfig.direction === "asc"
-                ? aString.localeCompare(bString)
-                : bString.localeCompare(aString);
+                ? String(aValue || "").localeCompare(String(bValue || ""))
+                : String(bValue || "").localeCompare(String(aValue || ""));
         });
 
     const uniqueRoles = [
@@ -117,8 +126,6 @@ export function PlayersTable() {
             <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
     );
-
-    const avatarClass = "w-[60px] h-[80px] object-cover";
 
     const visibleColumns = columns.filter((column) => {
         if (column.key === "role" && leagueConfig.system !== "classic") {
@@ -177,48 +184,7 @@ export function PlayersTable() {
                                                 : ""
                                         }
                                     >
-                                        {column.key === "photo" ? (
-                                            <Avatar className={avatarClass}>
-                                                <AvatarImage
-                                                    src={`https://content.fantacalcio.it/web/campioncini/medium/${formatPlayerNameForImage(
-                                                        player.name
-                                                    )}.png`}
-                                                    alt={player.name}
-                                                />
-                                                <AvatarFallback>
-                                                    {player.name
-                                                        .split(" ")
-                                                        .map((n) => n[0])
-                                                        .join("")}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        ) : column.key === "fantateam" ? (
-                                            player.fantateam ||
-                                            player.fantasy_team?.name ||
-                                            "Svincolato"
-                                        ) : column.key === "out_of_list" ? (
-                                            player.out_of_list ? (
-                                                <CheckCircle2 className="h-4 w-4 text-green-500 mx-auto" />
-                                            ) : (
-                                                <XCircle className="h-4 w-4 text-red-500 mx-auto" />
-                                            )
-                                        ) : column.key === "average_vote" ||
-                                          column.key === "average_fantavote" ? (
-                                            player[column.key]?.toFixed(2)
-                                        ) : column.key === "fantaprice" ? (
-                                            `${player[column.key]}M`
-                                        ) : column.key === "role" ? (
-                                            leagueConfig.system ===
-                                            "classic" ? (
-                                                player.role
-                                            ) : null
-                                        ) : column.key === "mantra_role" ? (
-                                            leagueConfig.system === "mantra" ? (
-                                                player.mantra_role
-                                            ) : null
-                                        ) : (
-                                            player[column.key]
-                                        )}
+                                        {renderTableCell(player, column)}
                                     </TableCell>
                                 ))}
                             </TableRow>
