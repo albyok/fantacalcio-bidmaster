@@ -6,9 +6,16 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { Card, CardContent } from "@/components/ui/card";
-import { Coins, User } from "lucide-react";
+import { Coins, User, Menu } from "lucide-react";
 import { PlayersTable } from "@/components/PlayersTable";
 import { PlayerImport } from "@/components/PlayerImport";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 const MOCK_PLAYERS = [
   {
@@ -108,27 +115,36 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="container px-4 py-8">
         <div className="space-y-6">
-          <Card className="bg-white">
-            <CardContent className="flex items-center justify-between p-6">
-              <div className="flex items-center space-x-4">
+          <div className="flex items-center justify-between bg-white rounded-lg shadow p-4">
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-3">
                 <User className="h-5 w-5 text-gray-500" />
-                <div>
-                  <p className="text-sm text-gray-500">Allenatore</p>
-                  <p className="font-medium">{profile?.email}</p>
-                </div>
+                <span className="text-sm text-gray-600">{profile?.email}</span>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="text-right">
-                  <p className="text-sm text-gray-500">Squadra</p>
-                  <p className="font-medium">{teamData?.name}</p>
-                </div>
+              <div className="flex items-center space-x-3">
+                <span className="text-sm font-medium">{teamData?.name}</span>
                 <div className="flex items-center space-x-2 bg-green-50 px-3 py-1 rounded-full">
                   <Coins className="h-4 w-4 text-green-600" />
                   <span className="text-green-600 font-medium">{teamData?.budget}M</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            
+            {profile?.is_admin && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => document.getElementById('playerImportSection')?.scrollIntoView({ behavior: 'smooth' })}>
+                    Importa Giocatori
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
 
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold tracking-tight">Asta Fantacalcio</h1>
@@ -138,8 +154,7 @@ const Index = () => {
           </div>
 
           {profile?.is_admin && (
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold tracking-tight">Importa Giocatori</h2>
+            <div id="playerImportSection" className="space-y-4">
               <PlayerImport />
             </div>
           )}
