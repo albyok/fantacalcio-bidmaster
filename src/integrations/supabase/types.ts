@@ -11,32 +11,50 @@ export type Database = {
     Tables: {
       players: {
         Row: {
+          average_fantavote: number | null
+          average_vote: number | null
           created_at: string
+          fantaprice: number | null
           fantasy_team_id: string | null
+          fantateam: string | null
           id: string
+          mantra_role: string | null
           name: string
+          out_of_list: boolean | null
+          played_matches: number | null
           role: string
-          starting_price: number
           team: string
           updated_at: string
         }
         Insert: {
+          average_fantavote?: number | null
+          average_vote?: number | null
           created_at?: string
+          fantaprice?: number | null
           fantasy_team_id?: string | null
+          fantateam?: string | null
           id?: string
+          mantra_role?: string | null
           name: string
+          out_of_list?: boolean | null
+          played_matches?: number | null
           role: string
-          starting_price?: number
           team: string
           updated_at?: string
         }
         Update: {
+          average_fantavote?: number | null
+          average_vote?: number | null
           created_at?: string
+          fantaprice?: number | null
           fantasy_team_id?: string | null
+          fantateam?: string | null
           id?: string
+          mantra_role?: string | null
           name?: string
+          out_of_list?: boolean | null
+          played_matches?: number | null
           role?: string
-          starting_price?: number
           team?: string
           updated_at?: string
         }

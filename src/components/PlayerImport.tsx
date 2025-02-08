@@ -20,7 +20,7 @@ export function PlayerImport() {
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData = XLSX.utils.sheet_to_json(firstSheet);
 
-        console.log('Dati Excel letti:', jsonData); // Log dei dati letti
+        console.log('Dati Excel letti:', jsonData);
 
         // Process each row and insert into the database
         for (const row of jsonData as any[]) {
@@ -32,7 +32,6 @@ export function PlayerImport() {
           let fantasyTeamId = null;
           if (row.Fantasquadra) {
             console.log('Cerco la Fantasquadra:', row.Fantasquadra);
-            // Get fantasy team ID using the function we just created
             const { data: teamData, error: teamError } = await supabase
               .rpc('get_team_id_by_name', {
                 team_name: row.Fantasquadra
@@ -46,23 +45,25 @@ export function PlayerImport() {
             }
           }
 
-          console.log('Inserimento giocatore:', {
+          const playerData = {
             name: row.Nome,
             team: row.Squadra,
             role: row.Ruolo,
-            starting_price: parseInt(row.Prezzo) || 1,
+            fantateam: row.Fantasquadra || null,
+            mantra_role: row["Ruolo mantra"] || null,
+            out_of_list: row["Fuori lista"] === true || row["Fuori lista"] === "true" || row["Fuori lista"] === 1,
+            played_matches: parseInt(row.PGv) || 0,
+            average_vote: parseFloat(row.MV) || 0,
+            average_fantavote: parseFloat(row.FM) || 0,
+            fantaprice: parseInt(row.Prezzo) || 1,
             fantasy_team_id: fantasyTeamId
-          });
+          };
+
+          console.log('Inserimento giocatore:', playerData);
 
           const { data, error } = await supabase
             .from('players')
-            .insert({
-              name: row.Nome,
-              team: row.Squadra,
-              role: row.Ruolo,
-              starting_price: parseInt(row.Prezzo) || 1,
-              fantasy_team_id: fantasyTeamId
-            });
+            .insert(playerData);
 
           if (error) {
             console.error('Errore durante l\'inserimento del giocatore:', error);
@@ -84,7 +85,7 @@ export function PlayerImport() {
         console.error('Errore durante l\'importazione:', error);
         toast({
           title: "Errore durante l'importazione",
-          description: "Si è verificato un errore durante l'importazione dei giocatori. Verifica che il file Excel abbia le colonne corrette: Nome, Squadra, Fantasquadra, Ruolo, Prezzo",
+          description: "Si è verificato un errore durante l'importazione dei giocatori. Verifica che il file Excel abbia le colonne corrette.",
           variant: "destructive",
         });
       }
