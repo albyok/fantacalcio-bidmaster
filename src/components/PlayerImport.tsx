@@ -25,10 +25,10 @@ export function PlayerImport() {
           await supabase
             .from('players')
             .insert({
-              name: row.nome || row.Nome || row.NOME,
-              team: row.squadra || row.Squadra || row.SQUADRA,
-              role: row.ruolo || row.Ruolo || row.RUOLO,
-              starting_price: parseInt(row.prezzo || row.Prezzo || row.PREZZO) || 1,
+              name: row.Nome,
+              team: row.Squadra,
+              role: row.Ruolo,
+              starting_price: parseInt(row.Prezzo) || 1,
             });
         }
 
@@ -40,7 +40,7 @@ export function PlayerImport() {
         console.error('Errore durante l\'importazione:', error);
         toast({
           title: "Errore durante l'importazione",
-          description: "Si è verificato un errore durante l'importazione dei giocatori.",
+          description: "Si è verificato un errore durante l'importazione dei giocatori. Verifica che il file Excel abbia le colonne corrette: Nome, Squadra, Ruolo, Prezzo",
           variant: "destructive",
         });
       }
