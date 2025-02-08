@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { PlayerCard } from "@/components/PlayerCard";
 import { useToast } from "@/components/ui/use-toast";
@@ -136,10 +137,12 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold tracking-tight">Importa Giocatori</h2>
-            <PlayerImport />
-          </div>
+          {profile?.is_admin && (
+            <div className="space-y-4">
+              <h2 className="text-2xl font-semibold tracking-tight">Importa Giocatori</h2>
+              <PlayerImport />
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {players.map((player) => (
