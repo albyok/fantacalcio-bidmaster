@@ -35,7 +35,7 @@ export function PlayerCard({
             <p className="text-sm text-muted-foreground">{team}</p>
           </div>
           {currentBid > startingPrice && (
-            <Badge variant="primary" className="flex items-center gap-1">
+            <Badge variant="secondary" className="flex items-center gap-1">
               <TrendingUp className="w-3 h-3" />
               Hot
             </Badge>
