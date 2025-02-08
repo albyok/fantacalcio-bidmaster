@@ -103,7 +103,7 @@ export function PlayersTable() {
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filtra per ruolo" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white border shadow-lg">
               <SelectItem value="all">Tutti i ruoli</SelectItem>
               {uniqueRoles.map(role => (
                 <SelectItem key={role} value={role}>{role}</SelectItem>
@@ -115,7 +115,7 @@ export function PlayersTable() {
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filtra per ruolo Mantra" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white border shadow-lg">
               <SelectItem value="all">Tutti i ruoli Mantra</SelectItem>
               {uniqueMantraRoles.map(role => (
                 <SelectItem key={role} value={role}>{role}</SelectItem>
@@ -167,3 +167,4 @@ export function PlayersTable() {
     </div>
   );
 }
+
