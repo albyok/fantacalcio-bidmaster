@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { Card, CardContent } from "@/components/ui/card";
 import { Coins, User } from "lucide-react";
+import { PlayersTable } from "@/components/PlayersTable";
 
 const MOCK_PLAYERS = [
   {
@@ -146,6 +147,11 @@ const Index = () => {
               />
             ))}
           </div>
+
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold tracking-tight">Lista Giocatori</h2>
+            <PlayersTable />
+          </div>
         </div>
       </div>
     </div>
@@ -153,3 +159,4 @@ const Index = () => {
 };
 
 export default Index;
+
