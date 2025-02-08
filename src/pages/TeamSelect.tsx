@@ -6,6 +6,9 @@ import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function TeamSelect() {
   const [teamName, setTeamName] = useState("");
@@ -14,7 +17,26 @@ export default function TeamSelect() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Fetch teams that don't have a coach yet
+  const { data: availableTeams } = useQuery({
+    queryKey: ['available-teams'],
+    queryFn: async () => {
+      const { data: teamsWithCoach } = await supabase
+        .from('user_teams')
+        .select('team_id');
+
+      const teamIds = teamsWithCoach?.map(ut => ut.team_id) || [];
+
+      const { data: teams } = await supabase
+        .from('teams')
+        .select('*')
+        .not('id', 'in', teamIds);
+
+      return teams || [];
+    }
+  });
+
+  const handleCreateTeam = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!teamName.trim() || !user) return;
 
@@ -54,39 +76,116 @@ export default function TeamSelect() {
     }
   };
 
+  const handleJoinTeam = async (teamId: string) => {
+    if (!user) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from("user_teams")
+        .insert([{ user_id: user.id, team_id: teamId }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Squadra selezionata!",
+        description: "Ti sei unito alla squadra con successo.",
+      });
+
+      navigate("/");
+    } catch (error) {
+      console.error("Error joining team:", error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore durante la selezione della squadra.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="w-full max-w-md space-y-8 p-8 bg-white rounded-lg shadow-lg">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">Crea la tua squadra</h1>
-          <p className="text-gray-600 mt-2">
-            Per partecipare all'asta, devi prima creare una squadra
-          </p>
-        </div>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-4xl">
+        <Tabs defaultValue="join" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="join">Unisciti a una squadra</TabsTrigger>
+            <TabsTrigger value="create">Crea una nuova squadra</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="join">
+            <Card>
+              <CardHeader>
+                <CardTitle>Squadre disponibili</CardTitle>
+                <CardDescription>
+                  Seleziona una squadra esistente da allenare
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-4">
+                {availableTeams?.length === 0 ? (
+                  <p className="text-center text-gray-500">
+                    Non ci sono squadre disponibili al momento
+                  </p>
+                ) : (
+                  availableTeams?.map((team) => (
+                    <div
+                      key={team.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
+                      <div>
+                        <h3 className="font-medium">{team.name}</h3>
+                        <p className="text-sm text-gray-500">Budget: {team.budget}M</p>
+                      </div>
+                      <Button
+                        onClick={() => handleJoinTeam(team.id)}
+                        disabled={isLoading}
+                      >
+                        Seleziona
+                      </Button>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          <div className="space-y-2">
-            <label htmlFor="teamName" className="block text-sm font-medium text-gray-700">
-              Nome della squadra
-            </label>
-            <Input
-              id="teamName"
-              type="text"
-              required
-              value={teamName}
-              onChange={(e) => setTeamName(e.target.value)}
-              placeholder="Inserisci il nome della tua squadra"
-            />
-          </div>
+          <TabsContent value="create">
+            <Card>
+              <CardHeader>
+                <CardTitle>Crea una nuova squadra</CardTitle>
+                <CardDescription>
+                  Inserisci il nome della tua nuova squadra
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleCreateTeam} className="space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="teamName" className="block text-sm font-medium text-gray-700">
+                      Nome della squadra
+                    </label>
+                    <Input
+                      id="teamName"
+                      type="text"
+                      required
+                      value={teamName}
+                      onChange={(e) => setTeamName(e.target.value)}
+                      placeholder="Inserisci il nome della tua squadra"
+                    />
+                  </div>
 
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isLoading || !teamName.trim()}
-          >
-            {isLoading ? "Creazione in corso..." : "Crea squadra"}
-          </Button>
-        </form>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading || !teamName.trim()}
+                  >
+                    {isLoading ? "Creazione in corso..." : "Crea squadra"}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
