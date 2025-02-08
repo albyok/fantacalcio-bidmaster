@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { PlayerCard } from "@/components/PlayerCard";
 import { useToast } from "@/components/ui/use-toast";
@@ -8,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { Card, CardContent } from "@/components/ui/card";
 import { Coins, User } from "lucide-react";
 import { PlayersTable } from "@/components/PlayersTable";
+import { PlayerImport } from "@/components/PlayerImport";
 
 const MOCK_PLAYERS = [
   {
@@ -44,7 +44,6 @@ const Index = () => {
   const [players, setPlayers] = useState(MOCK_PLAYERS);
   const { user } = useAuth();
 
-  // Fetch user's team data
   const { data: teamData } = useQuery({
     queryKey: ['user-team', user?.id],
     queryFn: async () => {
@@ -69,7 +68,6 @@ const Index = () => {
     enabled: !!user?.id
   });
 
-  // Fetch user profile data
   const { data: profile } = useQuery({
     queryKey: ['user-profile', user?.id],
     queryFn: async () => {
@@ -138,6 +136,11 @@ const Index = () => {
             </p>
           </div>
 
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold tracking-tight">Importa Giocatori</h2>
+            <PlayerImport />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {players.map((player) => (
               <PlayerCard
@@ -159,4 +162,3 @@ const Index = () => {
 };
 
 export default Index;
-
