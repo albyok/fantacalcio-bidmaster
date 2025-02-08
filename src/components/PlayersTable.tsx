@@ -13,10 +13,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 type SortConfig = {
   column: string;
   direction: 'asc' | 'desc';
+};
+
+const formatPlayerNameForImage = (name: string) => {
+  // Convert to uppercase and replace spaces with hyphens
+  return name.toUpperCase().replace(/\s+/g, '-');
 };
 
 export function PlayersTable() {
@@ -129,6 +135,7 @@ export function PlayersTable() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Foto</TableHead>
               <TableHead>{renderSortButton('name', 'Nome')}</TableHead>
               <TableHead>{renderSortButton('role', 'Ruolo')}</TableHead>
               <TableHead>{renderSortButton('mantra_role', 'Ruolo Mantra')}</TableHead>
@@ -144,6 +151,15 @@ export function PlayersTable() {
           <TableBody>
             {filteredAndSortedPlayers?.map((player) => (
               <TableRow key={player.id}>
+                <TableCell>
+                  <Avatar>
+                    <AvatarImage 
+                      src={`https://content.fantacalcio.it/web/campioncini/medium/${formatPlayerNameForImage(player.name)}.png`}
+                      alt={player.name}
+                    />
+                    <AvatarFallback>{player.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                  </Avatar>
+                </TableCell>
                 <TableCell className="font-medium">{player.name}</TableCell>
                 <TableCell>{player.role}</TableCell>
                 <TableCell>{player.mantra_role}</TableCell>
