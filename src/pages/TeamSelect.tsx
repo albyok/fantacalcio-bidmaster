@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +26,15 @@ export default function TeamSelect() {
 
       const teamIds = teamsWithCoach?.map(ut => ut.team_id) || [];
 
+      // If no teams have coaches yet, just fetch all teams
+      if (teamIds.length === 0) {
+        const { data: allTeams } = await supabase
+          .from('teams')
+          .select('*');
+        return allTeams || [];
+      }
+
+      // Otherwise, fetch teams that don't have coaches
       const { data: teams } = await supabase
         .from('teams')
         .select('*')
