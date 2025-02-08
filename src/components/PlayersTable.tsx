@@ -21,8 +21,8 @@ type SortConfig = {
 
 export function PlayersTable() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('');
-  const [mantraRoleFilter, setMantraRoleFilter] = useState<string>('');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [mantraRoleFilter, setMantraRoleFilter] = useState<string>('all');
   const [sortConfig, setSortConfig] = useState<SortConfig>({ column: 'name', direction: 'asc' });
 
   const { data: players, isLoading } = useQuery({
@@ -50,8 +50,8 @@ export function PlayersTable() {
   const filteredAndSortedPlayers = players
     ?.filter(player => {
       const matchesSearch = player.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesRole = !roleFilter || player.role === roleFilter;
-      const matchesMantraRole = !mantraRoleFilter || player.mantra_role === mantraRoleFilter;
+      const matchesRole = roleFilter === 'all' || player.role === roleFilter;
+      const matchesMantraRole = mantraRoleFilter === 'all' || player.mantra_role === mantraRoleFilter;
       return matchesSearch && matchesRole && matchesMantraRole;
     })
     .sort((a, b) => {
@@ -104,7 +104,7 @@ export function PlayersTable() {
               <SelectValue placeholder="Filtra per ruolo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Tutti i ruoli</SelectItem>
+              <SelectItem value="all">Tutti i ruoli</SelectItem>
               {uniqueRoles.map(role => (
                 <SelectItem key={role} value={role}>{role}</SelectItem>
               ))}
@@ -116,7 +116,7 @@ export function PlayersTable() {
               <SelectValue placeholder="Filtra per ruolo Mantra" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Tutti i ruoli Mantra</SelectItem>
+              <SelectItem value="all">Tutti i ruoli Mantra</SelectItem>
               {uniqueMantraRoles.map(role => (
                 <SelectItem key={role} value={role}>{role}</SelectItem>
               ))}
