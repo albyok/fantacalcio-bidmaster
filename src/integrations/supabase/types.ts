@@ -133,7 +133,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_team_id_by_name: {
+        Args: {
+          team_name: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       user_role: "admin" | "user"

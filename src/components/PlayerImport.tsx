@@ -24,10 +24,19 @@ export function PlayerImport() {
 
         // Process each row and insert into the database
         for (const row of jsonData as any[]) {
-          // Ora utilizziamo solo la colonna Squadra, ignorando Fantasquadra
           if (!row.Nome || !row.Squadra || !row.Ruolo) {
             console.error('Missing required data:', row);
             continue;
+          }
+
+          let fantasyTeamId = null;
+          if (row.Fantasquadra) {
+            // Get fantasy team ID using the function we just created
+            const { data: teamData } = await supabase
+              .rpc('get_team_id_by_name', {
+                team_name: row.Fantasquadra
+              });
+            fantasyTeamId = teamData;
           }
 
           await supabase
@@ -37,6 +46,7 @@ export function PlayerImport() {
               team: row.Squadra,
               role: row.Ruolo,
               starting_price: parseInt(row.Prezzo) || 1,
+              fantasy_team_id: fantasyTeamId
             });
         }
 
@@ -48,7 +58,7 @@ export function PlayerImport() {
         console.error('Errore durante l\'importazione:', error);
         toast({
           title: "Errore durante l'importazione",
-          description: "Si è verificato un errore durante l'importazione dei giocatori. Verifica che il file Excel abbia le colonne corrette: Nome, Squadra, Ruolo, Prezzo",
+          description: "Si è verificato un errore durante l'importazione dei giocatori. Verifica che il file Excel abbia le colonne corrette: Nome, Squadra, Fantasquadra, Ruolo, Prezzo",
           variant: "destructive",
         });
       }
