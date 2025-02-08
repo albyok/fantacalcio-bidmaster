@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { PlayerCard } from "@/components/PlayerCard";
 import { useToast } from "@/components/ui/use-toast";
@@ -26,6 +25,7 @@ const MOCK_PLAYERS = [
     startingPrice: 25,
     currentBid: 28,
     timeLeft: "2:30",
+    currentBidder: "Team A"
   },
   {
     id: 2,
@@ -35,15 +35,16 @@ const MOCK_PLAYERS = [
     startingPrice: 20,
     currentBid: 20,
     timeLeft: "3:45",
+    currentBidder: "Team B"
   },
   {
     id: 3,
     name: "Rafael Leão",
     team: "Milan",
-    role: "ATT",
     startingPrice: 22,
     currentBid: 25,
     timeLeft: "1:15",
+    currentBidder: "Team C"
   },
 ];
 
@@ -100,6 +101,7 @@ const Index = () => {
           return {
             ...player,
             currentBid: player.currentBid + 1,
+            currentBidder: teamData?.name || "Unknown"
           };
         }
         return player;
@@ -284,4 +286,3 @@ const Index = () => {
 };
 
 export default Index;
-

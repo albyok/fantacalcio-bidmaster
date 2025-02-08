@@ -20,4 +20,5 @@ export const columns = [
         sortable: false,
         align: "center",
     },
+    { key: "currentBidder", label: "Offerente Attuale", sortable: true, align: "center" },
 ];

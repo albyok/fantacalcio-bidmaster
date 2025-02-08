@@ -216,6 +216,8 @@ export function PlayersTable() {
                                             leagueConfig.system === "mantra" ? (
                                                 player.mantra_role
                                             ) : null
+                                        ) : column.key === "currentBidder" ? (
+                                            player.currentBidder
                                         ) : (
                                             player[column.key]
                                         )}

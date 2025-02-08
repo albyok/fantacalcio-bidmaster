@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ interface PlayerCardProps {
   currentBid: number;
   timeLeft: string;
   onBid: () => void;
+  currentBidder: string; // P59ea
 }
 
 export function PlayerCard({
@@ -22,6 +22,7 @@ export function PlayerCard({
   currentBid,
   timeLeft,
   onBid,
+  currentBidder, // P59ea
 }: PlayerCardProps) {
   return (
     <Card className="w-full max-w-sm overflow-hidden transition-all duration-300 hover:shadow-lg animate-slide-up">
@@ -55,6 +56,10 @@ export function PlayerCard({
             <span className="text-muted-foreground">Tempo rimasto</span>
             <span className="font-medium text-destructive">{timeLeft}</span>
           </div>
+          <div className="flex items-center justify-between text-sm"> {/* P5b3c */}
+            <span className="text-muted-foreground">Offerente attuale</span> {/* P5b3c */}
+            <span className="font-medium text-primary">{currentBidder}</span> {/* P5b3c */}
+          </div> {/* P5b3c */}
         </div>
 
         <Button
