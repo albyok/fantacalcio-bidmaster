@@ -20,26 +20,41 @@ export function PlayerImport() {
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData = XLSX.utils.sheet_to_json(firstSheet);
 
-        console.log('Excel data:', jsonData[0]); // Debug first row
+        console.log('Dati Excel letti:', jsonData); // Log dei dati letti
 
         // Process each row and insert into the database
         for (const row of jsonData as any[]) {
           if (!row.Nome || !row.Squadra || !row.Ruolo) {
-            console.error('Missing required data:', row);
+            console.error('Dati mancanti nella riga:', row);
             continue;
           }
 
           let fantasyTeamId = null;
           if (row.Fantasquadra) {
+            console.log('Cerco la Fantasquadra:', row.Fantasquadra);
             // Get fantasy team ID using the function we just created
-            const { data: teamData } = await supabase
+            const { data: teamData, error: teamError } = await supabase
               .rpc('get_team_id_by_name', {
                 team_name: row.Fantasquadra
               });
-            fantasyTeamId = teamData;
+
+            if (teamError) {
+              console.error('Errore nel recupero del team ID:', teamError);
+            } else {
+              console.log('Team ID trovato:', teamData);
+              fantasyTeamId = teamData;
+            }
           }
 
-          await supabase
+          console.log('Inserimento giocatore:', {
+            name: row.Nome,
+            team: row.Squadra,
+            role: row.Ruolo,
+            starting_price: parseInt(row.Prezzo) || 1,
+            fantasy_team_id: fantasyTeamId
+          });
+
+          const { data, error } = await supabase
             .from('players')
             .insert({
               name: row.Nome,
@@ -48,11 +63,22 @@ export function PlayerImport() {
               starting_price: parseInt(row.Prezzo) || 1,
               fantasy_team_id: fantasyTeamId
             });
+
+          if (error) {
+            console.error('Errore durante l\'inserimento del giocatore:', error);
+            toast({
+              title: "Errore durante l'inserimento",
+              description: `Errore per il giocatore ${row.Nome}: ${error.message}`,
+              variant: "destructive",
+            });
+          } else {
+            console.log('Giocatore inserito con successo:', data);
+          }
         }
 
         toast({
           title: "Importazione completata",
-          description: `Importati ${jsonData.length} giocatori con successo.`,
+          description: `Elaborati ${jsonData.length} giocatori.`,
         });
       } catch (error) {
         console.error('Errore durante l\'importazione:', error);
@@ -73,14 +99,6 @@ export function PlayerImport() {
 
     setIsLoading(true);
     try {
-      // Upload file to Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('xlsx')
-        .upload(`players-${Date.now()}.xlsx`, file);
-
-      if (error) throw error;
-
-      // Process the Excel file
       await processExcelFile(file);
     } catch (error) {
       console.error('Errore durante il caricamento:', error);
