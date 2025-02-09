@@ -11,7 +11,6 @@ type SortConfig = {
 export const usePlayerFilters = () => {
    const [searchQuery, setSearchQuery] = useState('');
    const [roleFilter, setRoleFilter] = useState<string>('all');
-   const [mantraRoleFilter, setMantraRoleFilter] = useState<string>('all');
    const [sortConfig, setSortConfig] = useState<SortConfig>({
       column: 'name',
       direction: 'asc',
@@ -37,12 +36,13 @@ export const usePlayerFilters = () => {
       }));
    };
 
+   const isClassic = leagueConfig.system === 'classic';
+
    const filteredAndSortedPlayers = players
       ?.filter(
          ({ name, role, mantra_role }) =>
             name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            (roleFilter === 'all' || role === roleFilter) &&
-            (mantraRoleFilter === 'all' || mantra_role === mantraRoleFilter)
+            (roleFilter === 'all' || (isClassic ? role.split('/').includes(roleFilter) : mantra_role.split('/').includes(roleFilter)))
       )
       .sort((a, b) => {
          const aValue = a[sortConfig.column as keyof typeof a];
@@ -57,20 +57,18 @@ export const usePlayerFilters = () => {
             : String(bValue || '').localeCompare(String(aValue || ''));
       });
 
-   const uniqueRoles = [...new Set(players?.map(player => player.role) || [])];
-   const uniqueMantraRoles = [...new Set(players?.map(player => player.mantra_role).filter(Boolean) || [])];
+   const uniqueRoles = [
+      ...new Set(players?.flatMap(player => (isClassic ? player.role.split('/') : player.mantra_role.split('/'))).filter(Boolean) || []),
+   ];
 
    return {
       filteredAndSortedPlayers,
       uniqueRoles,
-      uniqueMantraRoles,
       isLoading,
       searchQuery,
       setSearchQuery,
       roleFilter,
       setRoleFilter,
-      mantraRoleFilter,
-      setMantraRoleFilter,
       handleSort,
    };
 };

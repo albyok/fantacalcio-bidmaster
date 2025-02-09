@@ -1,22 +1,13 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, XCircle, ArrowUpDown } from 'lucide-react';
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { columns } from '@/config/playersTableColumns';
 import { PlayerFilters } from './PlayerFilters';
 import { leagueConfig } from '@/config/leagueConfig';
 import { PlayerAvatar } from './PlayerAvatar';
-import { useAuth } from '@/components/AuthProvider';
 import { useToast } from '@/components/ui/use-toast';
 import { placeBid } from '@/integrations/supabase/bids';
 import { usePlayerFilters } from '@/hooks/usePlayerFilters';
-
-type SortConfig = {
-   column: string;
-   direction: 'asc' | 'desc';
-};
 
 const renderTableCell = (player: any, column: any) => {
    switch (column.key) {
@@ -46,19 +37,7 @@ const renderTableCell = (player: any, column: any) => {
 
 export function PlayersTable() {
    const { toast } = useToast();
-   const {
-      filteredAndSortedPlayers,
-      uniqueRoles,
-      uniqueMantraRoles,
-      isLoading,
-      searchQuery,
-      setSearchQuery,
-      roleFilter,
-      setRoleFilter,
-      mantraRoleFilter,
-      setMantraRoleFilter,
-      handleSort,
-   } = usePlayerFilters();
+   const { filteredAndSortedPlayers, isLoading, searchQuery, setSearchQuery, roleFilter, setRoleFilter, handleSort } = usePlayerFilters();
 
    if (isLoading) {
       return <div className="text-center py-4">Caricamento giocatori...</div>;
@@ -100,16 +79,7 @@ export function PlayersTable() {
 
    return (
       <div className="space-y-4">
-         <PlayerFilters
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            roleFilter={roleFilter}
-            setRoleFilter={setRoleFilter}
-            mantraRoleFilter={mantraRoleFilter}
-            setMantraRoleFilter={setMantraRoleFilter}
-            uniqueRoles={uniqueRoles}
-            uniqueMantraRoles={uniqueMantraRoles}
-         />
+         <PlayerFilters searchQuery={searchQuery} setSearchQuery={setSearchQuery} roleFilter={roleFilter} setRoleFilter={setRoleFilter} />
          <div className="rounded-md border">
             <Table>
                <TableHeader>
