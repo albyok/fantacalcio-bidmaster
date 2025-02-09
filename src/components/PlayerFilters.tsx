@@ -29,14 +29,16 @@ export function PlayerFilters({
                placeholder="Cerca giocatore..."
                value={searchQuery}
                onChange={e => setSearchQuery(e.target.value)}
-               className="max-w-sm"
+               className="max-w-sm w-full"
             />
          </div>
-         <div className="flex gap-2">
-            <ToggleGroup type="single" value={roleFilter} onValueChange={setRoleFilter} className="flex gap-2">
-               <ToggleGroupItem value="all">Tutti i ruoli</ToggleGroupItem>
+         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <ToggleGroup type="single" value={roleFilter} onValueChange={setRoleFilter} className="flex gap-2 w-full sm:w-auto">
+               <ToggleGroupItem value="all" className="w-full sm:w-auto">
+                  Tutti i ruoli
+               </ToggleGroupItem>
                {roleOptions.map(role => (
-                  <ToggleGroupItem key={role} value={role}>
+                  <ToggleGroupItem key={role} value={role} className="w-full sm:w-auto">
                      {role}
                   </ToggleGroupItem>
                ))}
@@ -45,9 +47,12 @@ export function PlayerFilters({
                type="single"
                value={showPurchasable ? 'purchasable' : 'all'}
                onValueChange={() => setShowPurchasable(!showPurchasable)}
-               className="flex gap-2"
+               className="flex gap-2 w-full sm:w-auto"
             >
-               <ToggleGroupItem value="purchasable" className={`flex gap-2 ${showPurchasable ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
+               <ToggleGroupItem
+                  value="purchasable"
+                  className={`flex gap-2 w-full sm:w-auto ${showPurchasable ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+               >
                   Solo acquistabili
                </ToggleGroupItem>
             </ToggleGroup>

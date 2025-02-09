@@ -114,7 +114,7 @@ export function PlayersTable() {
                            {column.sortable ? renderSortButton(column.key, column.label) : column.label}
                         </TableHead>
                      ))}
-                     <TableHead className="text-center sticky right-0 bg-white">Offerta</TableHead>
+                     <TableHead className="text-center sticky right-0 bg-white"></TableHead>
                   </TableRow>
                </TableHeader>
                <TableBody>
