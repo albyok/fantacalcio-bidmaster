@@ -8,6 +8,8 @@ import { PlayerAvatar } from './PlayerAvatar';
 import { useToast } from '@/components/ui/use-toast';
 import { placeBid } from '@/integrations/supabase/bids';
 import { usePlayerFilters } from '@/hooks/usePlayerFilters';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './AuthProvider';
 
 const renderTableCell = (player: any, column: any) => {
    switch (column.key) {
@@ -37,6 +39,7 @@ const renderTableCell = (player: any, column: any) => {
 
 export function PlayersTable() {
    const { toast } = useToast();
+   const { user } = useAuth();
    const {
       filteredAndSortedPlayers,
       isLoading,
@@ -74,8 +77,17 @@ export function PlayersTable() {
    });
 
    const handlePlayerClick = async (playerId: number, bidAmount: number) => {
+      if (!user?.id) {
+         toast({
+            title: 'Errore',
+            description: 'Utente non autenticato.',
+            variant: 'destructive',
+         });
+         return;
+      }
+
       try {
-         await placeBid(playerId, bidAmount);
+         await placeBid(supabase, user.id, playerId, bidAmount);
          toast({
             title: 'Offerta effettuata!',
             description: 'La tua offerta è stata registrata con successo.',

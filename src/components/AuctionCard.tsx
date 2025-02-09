@@ -1,8 +1,8 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Star } from 'lucide-react';
 import { useState } from 'react';
+import { PlayerAvatar } from './PlayerAvatar'; // Importa il componente PlayerAvatar
 
 interface AuctionCardProps {
    name: string;
@@ -28,14 +28,17 @@ export function AuctionCard({ name, team, role, currentBid, player_id, onBid }: 
       <Card className="w-full max-w-sm overflow-hidden transition-all duration-300 hover:shadow-lg animate-slide-up">
          <div className="p-6 space-y-4">
             <div className="flex items-start justify-between">
-               <div>
-                  <h3 className="text-xl font-semibold tracking-tight flex items-center">
-                     {name}
-                     <Badge className="ml-2" variant="secondary">
-                        {role}
-                     </Badge>
-                  </h3>
-                  <p className="text-sm text-muted-foreground">{team}</p>
+               <div className="flex items-center">
+                  <PlayerAvatar name={name} />
+                  <div className="ml-4">
+                     <h3 className="text-xl font-semibold tracking-tight flex items-center">
+                        {name}
+                        <Badge className="ml-2" variant="secondary">
+                           {role}
+                        </Badge>
+                     </h3>
+                     <p className="text-sm text-muted-foreground">{team}</p>
+                  </div>
                </div>
             </div>
 
