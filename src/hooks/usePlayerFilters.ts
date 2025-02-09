@@ -15,6 +15,7 @@ export const usePlayerFilters = () => {
       column: 'name',
       direction: 'asc',
    });
+   const [showPurchasable, setShowPurchasable] = useState(false);
 
    const { data: players, isLoading } = useQuery({
       queryKey: ['players'],
@@ -40,9 +41,10 @@ export const usePlayerFilters = () => {
 
    const filteredAndSortedPlayers = players
       ?.filter(
-         ({ name, role, mantra_role }) =>
+         ({ name, role, mantra_role, fantateam, out_of_list }) =>
             name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            (roleFilter === 'all' || (isClassic ? role.split('/').includes(roleFilter) : mantra_role.split('/').includes(roleFilter)))
+            (roleFilter === 'all' || (isClassic ? role.split('/').includes(roleFilter) : mantra_role.split('/').includes(roleFilter))) &&
+            (!showPurchasable || (!fantateam && !out_of_list))
       )
       .sort((a, b) => {
          const aValue = a[sortConfig.column as keyof typeof a];
@@ -69,6 +71,8 @@ export const usePlayerFilters = () => {
       setSearchQuery,
       roleFilter,
       setRoleFilter,
+      showPurchasable,
+      setShowPurchasable,
       handleSort,
    };
 };

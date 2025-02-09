@@ -14,7 +14,7 @@ const renderTableCell = (player: any, column: any) => {
       case 'photo':
          return <PlayerAvatar name={player.name} />;
       case 'fantateam':
-         return player.fantateam || player.fantasy_team?.name || 'Svincolato';
+         return player.fantateam || player.fantasy_team?.name || '-';
       case 'out_of_list':
          return player.out_of_list ? (
             <CheckCircle2 className="h-4 w-4 text-green-500 mx-auto" />
@@ -25,7 +25,7 @@ const renderTableCell = (player: any, column: any) => {
       case 'average_fantavote':
          return player[column.key]?.toFixed(2);
       case 'fantaprice':
-         return `${player[column.key]}M`;
+         return player.fantateam || player.fantasy_team?.name ? `${player[column.key]}M` : '';
       case 'role':
          return leagueConfig.system === 'classic' ? player.role : null;
       case 'mantra_role':
@@ -37,7 +37,17 @@ const renderTableCell = (player: any, column: any) => {
 
 export function PlayersTable() {
    const { toast } = useToast();
-   const { filteredAndSortedPlayers, isLoading, searchQuery, setSearchQuery, roleFilter, setRoleFilter, handleSort } = usePlayerFilters();
+   const {
+      filteredAndSortedPlayers,
+      isLoading,
+      searchQuery,
+      setSearchQuery,
+      roleFilter,
+      setRoleFilter,
+      showPurchasable,
+      setShowPurchasable,
+      handleSort,
+   } = usePlayerFilters();
 
    if (isLoading) {
       return <div className="text-center py-4">Caricamento giocatori...</div>;
@@ -55,6 +65,9 @@ export function PlayersTable() {
          return false;
       }
       if (column.key === 'mantra_role' && leagueConfig.system !== 'mantra') {
+         return false;
+      }
+      if (showPurchasable && ['fantateam', 'fantaprice', 'out_of_list'].includes(column.key)) {
          return false;
       }
       return true;
@@ -79,28 +92,45 @@ export function PlayersTable() {
 
    return (
       <div className="space-y-4">
-         <PlayerFilters searchQuery={searchQuery} setSearchQuery={setSearchQuery} roleFilter={roleFilter} setRoleFilter={setRoleFilter} />
+         <PlayerFilters
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            roleFilter={roleFilter}
+            setRoleFilter={setRoleFilter}
+            showPurchasable={showPurchasable}
+            setShowPurchasable={setShowPurchasable}
+         />
          <div className="rounded-md border">
             <Table>
                <TableHeader>
                   <TableRow>
                      {visibleColumns.map(column => (
-                        <TableHead key={column.key} className={column.align ? `text-${column.align}` : ''}>
+                        <TableHead
+                           key={column.key}
+                           className={`${column.align ? `text-${column.align}` : ''} ${
+                              column.key === 'photo' || column.key === 'name' ? 'sticky left-0 bg-white' : ''
+                           }`}
+                        >
                            {column.sortable ? renderSortButton(column.key, column.label) : column.label}
                         </TableHead>
                      ))}
-                     <TableHead className="text-center">Offerta</TableHead>
+                     <TableHead className="text-center sticky right-0 bg-white">Offerta</TableHead>
                   </TableRow>
                </TableHeader>
                <TableBody>
                   {filteredAndSortedPlayers?.map(player => (
                      <TableRow key={player.id}>
                         {visibleColumns.map(column => (
-                           <TableCell key={column.key} className={column.align ? `text-${column.align}` : ''}>
+                           <TableCell
+                              key={column.key}
+                              className={`${column.align ? `text-${column.align}` : ''} ${
+                                 column.key === 'photo' || column.key === 'name' ? 'sticky left-0 bg-white' : ''
+                              }`}
+                           >
                               {renderTableCell(player, column)}
                            </TableCell>
                         ))}
-                        <TableCell className="text-center">
+                        <TableCell className="text-center sticky right-0 bg-white">
                            <Button variant="outline" onClick={() => handlePlayerClick(player.player_id, 1)}>
                               Offri
                            </Button>
