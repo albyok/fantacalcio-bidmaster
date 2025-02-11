@@ -1,10 +1,12 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PlayerAvatar } from './PlayerAvatar';
 import { TrashIcon } from '@heroicons/react/24/outline';
-import { userIsAdmin } from '@/queries/useUserData';
+import { useCurrentUserId, useUserIsAdmin } from '@/queries/useUserData';
+import { supabase } from '@/integrations/supabase/client';
+
 interface AuctionCardProps {
    name: string;
    team: string;
@@ -18,7 +20,19 @@ interface AuctionCardProps {
 export function AuctionCard({ name, team, role, currentBid, player_id, onBid, onDelete }: AuctionCardProps) {
    const [showInput, setShowInput] = useState(false);
    const [bidAmount, setBidAmount] = useState(currentBid + 1);
-   const isAdmin = userIsAdmin();
+   const isAdmin = useUserIsAdmin();
+   const [teamName, setTeamName] = useState<string | null>(null);
+   const userId = useCurrentUserId();
+
+   useEffect(() => {
+      async function fetchTeamName() {
+         const { data, error } = await supabase.from('user_teams').select('teams(name)').eq('user_id', userId).single();
+         if (data) {
+            setTeamName(data.teams.name);
+         }
+      }
+      fetchTeamName();
+   }, [player_id]);
 
    const handleBid = () => {
       if (bidAmount > currentBid) {
@@ -41,6 +55,7 @@ export function AuctionCard({ name, team, role, currentBid, player_id, onBid, on
                         </Badge>
                      </h3>
                      <p className="text-sm text-muted-foreground">{team}</p>
+                     {teamName && <p className="text-sm text-muted-foreground">Offerta da: {teamName}</p>}
                   </div>
                </div>
                {isAdmin && (

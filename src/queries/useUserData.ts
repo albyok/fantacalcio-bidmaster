@@ -34,9 +34,13 @@ export const useProfileData = userId => {
    });
 };
 
-export const userIsAdmin = () => {
+export const useCurrentUserId = () => {
    const { user } = useAuth();
-   const userId = user?.id;
+   return user?.id || null;
+};
+
+export const useUserIsAdmin = () => {
+   const userId = useCurrentUserId();
 
    const { data: profileData, isLoading } = useProfileData(userId);
 

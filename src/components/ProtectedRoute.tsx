@@ -1,17 +1,16 @@
-
-import { Navigate } from "react-router-dom";
-import { useAuth } from "./AuthProvider";
+import { Navigate } from 'react-router-dom';
+import { useAuth } from './AuthProvider';
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
+   const { user, loading } = useAuth();
 
-  if (loading) {
-    return <div>Caricamento...</div>;
-  }
+   if (loading) {
+      return <div>Caricamento...</div>;
+   }
 
-  if (!user) {
-    return <Navigate to="/auth" />;
-  }
+   if (!user) {
+      return <Navigate to="/auth" />;
+   }
 
-  return <>{children}</>;
+   return <>{children}</>;
 };
