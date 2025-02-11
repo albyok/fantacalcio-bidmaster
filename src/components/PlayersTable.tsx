@@ -87,7 +87,7 @@ export function PlayersTable() {
       }
 
       try {
-         await placeBid(supabase, user.id, playerId, bidAmount);
+         await placeBid(user.id, playerId, bidAmount);
          toast({
             title: 'Offerta effettuata!',
             description: 'La tua offerta è stata registrata con successo.',

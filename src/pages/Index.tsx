@@ -3,7 +3,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/components/AuthProvider';
 import { PlayersTable } from '@/components/PlayersTable';
 import Header from '@/components/Header';
-import { useTeamData, useProfileData, usePlayersData } from '@/queries/useUserData';
+import { useTeamData, useProfileData } from '@/queries/useUserData';
+import { getBids } from '@/integrations/supabase/bids';
 import { BidManager } from '@/components/BidManager';
 
 const Index = () => {
@@ -13,7 +14,7 @@ const Index = () => {
 
    const { data: teamData } = useTeamData(user?.id);
    const { data: profile } = useProfileData(user?.id);
-   const { data: playersData } = usePlayersData(user?.id);
+   const { data: playersData } = getBids(user?.id);
 
    return (
       <div className="min-h-screen bg-gray-50">

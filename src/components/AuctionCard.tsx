@@ -2,8 +2,9 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import { PlayerAvatar } from './PlayerAvatar'; // Importa il componente PlayerAvatar
-
+import { PlayerAvatar } from './PlayerAvatar';
+import { TrashIcon } from '@heroicons/react/24/outline';
+import { userIsAdmin } from '@/queries/useUserData';
 interface AuctionCardProps {
    name: string;
    team: string;
@@ -11,11 +12,13 @@ interface AuctionCardProps {
    currentBid: number;
    player_id: number;
    onBid: (playerId: number, bidAmount: number) => void;
+   onDelete: (playerId: number) => void;
 }
 
-export function AuctionCard({ name, team, role, currentBid, player_id, onBid }: AuctionCardProps) {
+export function AuctionCard({ name, team, role, currentBid, player_id, onBid, onDelete }: AuctionCardProps) {
    const [showInput, setShowInput] = useState(false);
    const [bidAmount, setBidAmount] = useState(currentBid + 1);
+   const isAdmin = userIsAdmin();
 
    const handleBid = () => {
       if (bidAmount > currentBid) {
@@ -40,6 +43,11 @@ export function AuctionCard({ name, team, role, currentBid, player_id, onBid }: 
                      <p className="text-sm text-muted-foreground">{team}</p>
                   </div>
                </div>
+               {isAdmin && (
+                  <button onClick={() => onDelete(player_id)} className="text-red-500 hover:text-red-700 transition-colors duration-300">
+                     <TrashIcon className="w-5 h-5" />
+                  </button>
+               )}
             </div>
 
             <div className="space-y-2">
