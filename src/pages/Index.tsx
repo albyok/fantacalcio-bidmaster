@@ -14,7 +14,7 @@ const Index = () => {
 
    const { data: teamData } = useTeamData(user?.id);
    const { data: profile } = useProfileData(user?.id);
-   const { data: playersData } = getBids(user?.id);
+   const { data: allBids } = getBids();
 
    return (
       <div className="min-h-screen bg-gray-50">
@@ -25,7 +25,7 @@ const Index = () => {
                   <p className="text-muted-foreground">Fai le tue offerte per i migliori giocatori della Serie A</p>
                </div>
                <Header profile={profile} teamData={teamData} isLoading={isLoading} setIsLoading={setIsLoading} />
-               {playersData && <BidManager playersData={playersData} toast={toast} />}
+               {allBids && <BidManager allBids={allBids} toast={toast} />}
                <div className="space-y-4">
                   <h2 className="text-2xl font-semibold tracking-tight">Lista Giocatori</h2>
                   <PlayersTable />

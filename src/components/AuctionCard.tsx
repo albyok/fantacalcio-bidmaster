@@ -8,16 +8,19 @@ import { useCurrentUserId, useUserIsAdmin } from '@/queries/useUserData';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AuctionCardProps {
-   name: string;
-   team: string;
-   role: string;
+   player: {
+      name: string;
+      team: string;
+      role: string;
+      player_id: number;
+   };
    currentBid: number;
-   player_id: number;
    onBid: (playerId: number, bidAmount: number) => void;
    onDelete: (playerId: number) => void;
 }
 
-export function AuctionCard({ name, team, role, currentBid, player_id, onBid, onDelete }: AuctionCardProps) {
+export function AuctionCard({ player, currentBid, onBid, onDelete }: AuctionCardProps) {
+   const { name, team, role, player_id } = player;
    const [showInput, setShowInput] = useState(false);
    const [bidAmount, setBidAmount] = useState(currentBid + 1);
    const isAdmin = useUserIsAdmin();

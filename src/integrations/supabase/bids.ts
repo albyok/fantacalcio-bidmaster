@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { GetAllBidDetailsResponse } from './types';
 
 export const placeBid = async (userId: string, playerId: number, bidAmount: number) => {
    const { error } = await supabase.from('bids').insert({
@@ -13,27 +14,29 @@ export const placeBid = async (userId: string, playerId: number, bidAmount: numb
    }
 };
 
-export const getBids = userId => {
+export const getBids = () => {
    return useQuery({
-      queryKey: ['user-bids', userId],
+      queryKey: ['user-bids'],
       queryFn: async () => {
-         if (!userId) return [];
+         const { data, error } = await supabase.rpc('get_all_bid_details', {});
 
-         const { data: userBids } = await supabase.from('bids').select('player_id, bid_amount').eq('user_id', userId);
+         if (error) {
+            console.error('Error fetching bid details:', error);
+            return [];
+         }
 
-         if (!userBids) return [];
+         const maxBids = data.reduce((acc, bid) => {
+            if (!acc[bid.player_id] || acc[bid.player_id].bid_amount < bid.bid_amount) {
+               acc[bid.player_id] = bid;
+            }
+            return acc;
+         }, {});
 
-         const playerIds = userBids.map(bid => bid.player_id);
-         const { data: players } = await supabase.from('players').select('*').in('player_id', playerIds);
+         const result = Object.values(maxBids);
 
-         const playersWithBids = players.map(player => ({
-            ...player,
-            currentBid: userBids.find(bid => bid.player_id === player.player_id)?.bid_amount || player.fantaprice,
-         }));
-
-         return playersWithBids;
+         console.log('Bid details:', result);
+         return result;
       },
-      enabled: !!userId,
    });
 };
 

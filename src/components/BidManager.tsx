@@ -3,9 +3,10 @@ import { AuctionCard } from '@/components/AuctionCard';
 import { placeBid, deleteBid } from '@/integrations/supabase/bids';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthProvider';
+import { BidDetail } from '@/integrations/supabase/types';
 
-export const BidManager = ({ playersData, toast }) => {
-   const [players, setPlayers] = useState(playersData || []);
+export const BidManager = ({ allBids, toast }) => {
+   const [players, setPlayers] = useState<BidDetail[]>(allBids || []);
    const { user } = useAuth();
 
    const handleBid = async (playerId: number, bidAmount: number) => {
@@ -14,7 +15,7 @@ export const BidManager = ({ playersData, toast }) => {
             if (player.player_id === playerId) {
                return {
                   ...player,
-                  currentBid: bidAmount,
+                  bid_amount: bidAmount,
                };
             }
             return player;
@@ -60,9 +61,14 @@ export const BidManager = ({ playersData, toast }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
          {players.map(player => (
             <AuctionCard
-               key={player.id}
-               {...player}
-               player_id={player.player_id}
+               key={player.player_id}
+               player={{
+                  name: player.player_name,
+                  team: player.player_team,
+                  role: player.player_role,
+                  player_id: player.player_id,
+               }}
+               currentBid={player.bid_amount}
                onBid={(playerId, bidAmount) => handleBid(playerId, bidAmount)}
                onDelete={playerId => handleDelete(playerId)}
             />

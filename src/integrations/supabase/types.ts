@@ -34,7 +34,7 @@ export type Database = {
                out_of_list?: boolean | null;
                played_matches?: number | null;
                role: string;
-               team: string;
+               team?: string;
                updated_at?: string;
                player_id?: number;
             };
@@ -182,13 +182,6 @@ export type Database = {
                   isOneToOne: false;
                   referencedRelation: 'players';
                   referencedColumns: ['id'];
-               },
-               {
-                  foreignKeyName: 'user_teams_user_id_fkey';
-                  columns: ['user_id'];
-                  isOneToOne: false;
-                  referencedRelation: 'user_teams';
-                  referencedColumns: ['user_id'];
                }
             ];
          };
@@ -203,6 +196,10 @@ export type Database = {
             };
             Returns: string;
          };
+         get_all_bid_details: {
+            Args: {};
+            Returns: BidDetail[];
+         };
       };
       Enums: {
          user_role: 'admin' | 'user';
@@ -212,6 +209,20 @@ export type Database = {
       };
    };
 };
+
+export interface BidDetail {
+   player_id: number;
+   teamName: string;
+   bid_amount: number;
+   player_name: string;
+   player_team: string;
+   player_role: string;
+   player_mantra_role: string;
+}
+
+export type GetAllBidDetailsResponse = BidDetail[];
+
+export type GetAllBidDetailsFunction = () => Promise<GetAllBidDetailsResponse>;
 
 type PublicSchema = Database[Extract<keyof Database, 'public'>];
 
