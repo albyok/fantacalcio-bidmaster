@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/components/AuthProvider';
 import { PlayersTable } from '@/components/PlayersTable';
@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import { useTeamData, useProfileData } from '@/queries/useUserData';
 import { getBids } from '@/integrations/supabase/bids';
 import { BidManager } from '@/components/BidManager';
+import { usePlayersForFantateam } from '@/queries/usePlayersData';
 
 const Index = () => {
    const { toast } = useToast();
@@ -24,7 +25,7 @@ const Index = () => {
                   <h1 className="text-3xl font-bold tracking-tight">Asta Fantacalcio</h1>
                   <p className="text-muted-foreground">Fai le tue offerte per i migliori giocatori della Serie A</p>
                </div>
-               <Header profile={profile} teamData={teamData} isLoading={isLoading} setIsLoading={setIsLoading} />
+               {profile && <Header profile={profile} teamData={teamData} isLoading={isLoading} setIsLoading={setIsLoading} />}
                {allBids && <BidManager allBids={allBids} toast={toast} />}
                <div className="space-y-4">
                   <h2 className="text-2xl font-semibold tracking-tight">Lista Giocatori</h2>

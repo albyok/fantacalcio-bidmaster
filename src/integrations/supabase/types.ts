@@ -1,3 +1,5 @@
+import { Player } from '@/models/player';
+
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
@@ -200,6 +202,24 @@ export type Database = {
             Args: {};
             Returns: BidDetail[];
          };
+         get_winning_bids_by_team: {
+            Args: {
+               team_user_id: string;
+            };
+            Returns: GetWinningBidsByTeamResponse[];
+         };
+         get_remaining_budget: {
+            Args: {
+               p_user_id: string;
+            };
+            Returns: number;
+         };
+         get_fantateam_players: {
+            Args: {
+               p_fantasy_team_id: string;
+            };
+            Returns: Player[];
+         };
       };
       Enums: {
          user_role: 'admin' | 'user';
@@ -218,11 +238,22 @@ export interface BidDetail {
    player_team: string;
    player_role: string;
    player_mantra_role: string;
+   creation_date: string;
 }
 
 export type GetAllBidDetailsResponse = BidDetail[];
 
 export type GetAllBidDetailsFunction = () => Promise<GetAllBidDetailsResponse>;
+
+export type GetWinningBidsByTeamResponse = {
+   user_id: string;
+   player_id: number;
+   bid_amount: number;
+   player_name: string;
+   team_name: string;
+};
+
+export type GetWinningBidsByTeamFunction = (team_user_id: string) => Promise<GetWinningBidsByTeamResponse[]>;
 
 type PublicSchema = Database[Extract<keyof Database, 'public'>];
 

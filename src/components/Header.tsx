@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { processExcelFile } from '@/utils/excelProcessor';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { getRemainingBudget } from '@/integrations/supabase/bids';
 
 const Header = ({ profile, teamData, isLoading, setIsLoading }) => {
    const { toast } = useToast();
+   const { data: remainingBudget } = getRemainingBudget(profile?.id);
 
    const handleImportClick = () => {
       const input = document.createElement('input');
@@ -44,7 +46,7 @@ const Header = ({ profile, teamData, isLoading, setIsLoading }) => {
                <span className="text-sm font-medium">{teamData?.name}</span>
                <div className="flex items-center space-x-2 bg-green-50 px-3 py-1 rounded-full">
                   <Coins className="h-4 w-4 text-green-600" />
-                  <span className="text-green-600 font-medium">{teamData?.budget}M</span>
+                  <span className="text-green-600 font-medium">{remainingBudget}M</span>
                </div>
             </div>
          </div>

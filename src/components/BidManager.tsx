@@ -1,24 +1,25 @@
 import { useState } from 'react';
 import { AuctionCard } from '@/components/AuctionCard';
-import { placeBid, deleteBid } from '@/integrations/supabase/bids';
+import { placeBid, deleteBid, getWinningBids, getRemainingBudget } from '@/integrations/supabase/bids';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthProvider';
 import { BidDetail } from '@/integrations/supabase/types';
+import { useCurrentUserId } from '@/queries/useUserData';
 
 export const BidManager = ({ allBids, toast }) => {
-   const [players, setPlayers] = useState<BidDetail[]>(allBids || []);
+   const [bids, setBids] = useState<BidDetail[]>(allBids || []);
    const { user } = useAuth();
 
    const handleBid = async (playerId: number, bidAmount: number) => {
-      setPlayers(currentPlayers =>
-         currentPlayers.map(player => {
-            if (player.player_id === playerId) {
+      setBids(currentBids =>
+         currentBids.map(bid => {
+            if (bid.player_id === playerId) {
                return {
-                  ...player,
+                  ...bid,
                   bid_amount: bidAmount,
                };
             }
-            return player;
+            return bid;
          })
       );
 
@@ -39,7 +40,7 @@ export const BidManager = ({ allBids, toast }) => {
    };
 
    const handleDelete = async (playerId: number) => {
-      setPlayers(currentPlayers => currentPlayers.filter(player => player.player_id !== playerId));
+      setBids(currentBids => currentBids.filter(bid => bid.player_id !== playerId));
 
       try {
          await deleteBid(playerId);
@@ -59,16 +60,10 @@ export const BidManager = ({ allBids, toast }) => {
 
    return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-         {players.map(player => (
+         {bids.map(bid => (
             <AuctionCard
-               key={player.player_id}
-               player={{
-                  name: player.player_name,
-                  team: player.player_team,
-                  role: player.player_role,
-                  player_id: player.player_id,
-               }}
-               currentBid={player.bid_amount}
+               key={bid.player_id}
+               bidDetails={bid}
                onBid={(playerId, bidAmount) => handleBid(playerId, bidAmount)}
                onDelete={playerId => handleDelete(playerId)}
             />

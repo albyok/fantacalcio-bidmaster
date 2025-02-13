@@ -6,21 +6,18 @@ import { PlayerAvatar } from './PlayerAvatar';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { useCurrentUserId, useUserIsAdmin } from '@/queries/useUserData';
 import { supabase } from '@/integrations/supabase/client';
+import { BidDetail } from '@/integrations/supabase/types';
+import { leagueConfig } from '@/config/leagueConfig';
 
 interface AuctionCardProps {
-   player: {
-      name: string;
-      team: string;
-      role: string;
-      player_id: number;
-   };
-   currentBid: number;
+   bidDetails: BidDetail;
    onBid: (playerId: number, bidAmount: number) => void;
    onDelete: (playerId: number) => void;
 }
 
-export function AuctionCard({ player, currentBid, onBid, onDelete }: AuctionCardProps) {
-   const { name, team, role, player_id } = player;
+export function AuctionCard({ bidDetails, onBid, onDelete }: AuctionCardProps) {
+   const { player_name, player_team, player_role, player_id, player_mantra_role } = bidDetails;
+   const { bid_amount: currentBid } = bidDetails;
    const [showInput, setShowInput] = useState(false);
    const [bidAmount, setBidAmount] = useState(currentBid + 1);
    const isAdmin = useUserIsAdmin();
@@ -49,15 +46,15 @@ export function AuctionCard({ player, currentBid, onBid, onDelete }: AuctionCard
          <div className="p-6 space-y-4">
             <div className="flex items-start justify-between">
                <div className="flex items-center">
-                  <PlayerAvatar name={name} />
+                  <PlayerAvatar name={player_name} />
                   <div className="ml-4">
                      <h3 className="text-xl font-semibold tracking-tight flex items-center">
-                        {name}
+                        {player_name}
                         <Badge className="ml-2" variant="secondary">
-                           {role}
+                           {leagueConfig.system === 'mantra' ? player_mantra_role : player_role}
                         </Badge>
                      </h3>
-                     <p className="text-sm text-muted-foreground">{team}</p>
+                     <p className="text-sm text-muted-foreground">{player_team}</p>
                      {teamName && <p className="text-sm text-muted-foreground">Offerta da: {teamName}</p>}
                   </div>
                </div>

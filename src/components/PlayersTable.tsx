@@ -8,7 +8,6 @@ import { PlayerAvatar } from './PlayerAvatar';
 import { useToast } from '@/components/ui/use-toast';
 import { placeBid } from '@/integrations/supabase/bids';
 import { usePlayerFilters } from '@/hooks/usePlayerFilters';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthProvider';
 
 const renderTableCell = (player: any, column: any) => {

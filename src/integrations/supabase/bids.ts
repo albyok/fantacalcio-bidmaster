@@ -1,6 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { GetAllBidDetailsResponse } from './types';
 
 export const placeBid = async (userId: string, playerId: number, bidAmount: number) => {
    const { error } = await supabase.from('bids').insert({
@@ -35,7 +34,25 @@ export const getBids = () => {
          const result = Object.values(maxBids);
 
          console.log('Bid details:', result);
+
          return result;
+      },
+   });
+};
+
+export const getWinningBids = (teamUserId: string) => {
+   return useQuery({
+      queryKey: ['winning-bids', teamUserId],
+      queryFn: async () => {
+         const { data, error } = await supabase.rpc('get_winning_bids_by_team', { team_user_id: teamUserId });
+
+         if (error) {
+            console.error('Error fetching winning bids:', error);
+            return [];
+         }
+
+         console.log('Winning bids:', data);
+         return data;
       },
    });
 };
@@ -46,4 +63,21 @@ export const deleteBid = async (playerId: number) => {
    if (error) {
       throw error;
    }
+};
+
+export const getRemainingBudget = (userId: string) => {
+   return useQuery({
+      queryKey: ['remaining-budget', userId],
+      queryFn: async () => {
+         const { data, error } = await supabase.rpc('get_remaining_budget', { p_user_id: userId });
+
+         if (error) {
+            console.error('Error fetching remaining budget:', error);
+            return null;
+         }
+
+         console.log('Remaining budget:', data);
+         return data;
+      },
+   });
 };
