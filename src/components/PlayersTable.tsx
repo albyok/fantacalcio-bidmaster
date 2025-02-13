@@ -6,9 +6,11 @@ import { PlayerFilters } from './PlayerFilters';
 import { leagueConfig } from '@/config/leagueConfig';
 import { PlayerAvatar } from './PlayerAvatar';
 import { useToast } from '@/components/ui/use-toast';
-import { placeBid } from '@/integrations/supabase/bids';
 import { usePlayerFilters } from '@/hooks/usePlayerFilters';
 import { useAuth } from './AuthProvider';
+import { PlayerBidModal } from './PlayerBidModal';
+import { useState } from 'react';
+import { Player } from '@/models/player';
 
 const renderTableCell = (player: any, column: any) => {
    switch (column.key) {
@@ -50,6 +52,18 @@ export function PlayersTable() {
       setShowPurchasable,
       handleSort,
    } = usePlayerFilters();
+   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+   const [isModalOpen, setIsModalOpen] = useState(false);
+
+   const openModal = (player: Player) => {
+      setSelectedPlayer(player);
+      setIsModalOpen(true);
+   };
+
+   const closeModal = () => {
+      setIsModalOpen(false);
+      setSelectedPlayer(null);
+   };
 
    if (isLoading) {
       return <div className="text-center py-4">Caricamento giocatori...</div>;
@@ -74,32 +88,6 @@ export function PlayersTable() {
       }
       return true;
    });
-
-   const handlePlayerClick = async (playerId: number, bidAmount: number) => {
-      if (!user?.id) {
-         toast({
-            title: 'Errore',
-            description: 'Utente non autenticato.',
-            variant: 'destructive',
-         });
-         return;
-      }
-
-      try {
-         await placeBid(user.id, playerId, bidAmount);
-         toast({
-            title: 'Offerta effettuata!',
-            description: 'La tua offerta è stata registrata con successo.',
-         });
-      } catch (error) {
-         console.error("Errore durante l'inserimento dell'offerta:", error);
-         toast({
-            title: 'Errore',
-            description: "Si è verificato un errore durante l'inserimento dell'offerta.",
-            variant: 'destructive',
-         });
-      }
-   };
 
    return (
       <div className="space-y-4">
@@ -142,15 +130,18 @@ export function PlayersTable() {
                            </TableCell>
                         ))}
                         <TableCell className="text-center sticky right-0 bg-white">
-                           <Button variant="outline" onClick={() => handlePlayerClick(player.player_id, 1)}>
-                              Offri
-                           </Button>
+                           {!player.fantateam && !player.out_of_list && (
+                              <Button variant="outline" onClick={() => openModal(player)}>
+                                 Offri
+                              </Button>
+                           )}
                         </TableCell>
                      </TableRow>
                   ))}
                </TableBody>
             </Table>
          </div>
+         {selectedPlayer && <PlayerBidModal isOpen={isModalOpen} onClose={closeModal} player={selectedPlayer} />}
       </div>
    );
 }

@@ -153,6 +153,7 @@ export type Database = {
                id: string;
                user_id: string;
                player_id: number;
+               selling_player_id: number;
                bid_amount: number;
                created_at: string;
             };
@@ -160,6 +161,7 @@ export type Database = {
                id?: string;
                user_id: string;
                player_id: number;
+               selling_player_id: number;
                bid_amount: number;
                created_at?: string;
             };
@@ -167,6 +169,7 @@ export type Database = {
                id?: string;
                user_id?: string;
                player_id?: number;
+               selling_player_id: number;
                bid_amount?: number;
                created_at?: string;
             };

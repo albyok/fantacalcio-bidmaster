@@ -1,10 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
-export const placeBid = async (userId: string, playerId: number, bidAmount: number) => {
+export const placeBid = async (userId: string, playerId: number, selling_player_id: number, bidAmount: number) => {
    const { error } = await supabase.from('bids').insert({
       user_id: userId,
       player_id: playerId,
+      selling_player_id: selling_player_id,
       bid_amount: bidAmount,
    });
 

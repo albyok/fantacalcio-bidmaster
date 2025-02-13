@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/components/AuthProvider';
 import { PlayersTable } from '@/components/PlayersTable';
@@ -6,7 +6,6 @@ import Header from '@/components/Header';
 import { useTeamData, useProfileData } from '@/queries/useUserData';
 import { getBids } from '@/integrations/supabase/bids';
 import { BidManager } from '@/components/BidManager';
-import { usePlayersForFantateam } from '@/queries/usePlayersData';
 
 const Index = () => {
    const { toast } = useToast();
