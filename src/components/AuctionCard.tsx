@@ -79,7 +79,7 @@ export function AuctionCard({ bidDetails, onBid, onDelete }: AuctionCardProps) {
                </div>
             </div>
 
-            {bidDetails.fantateam_id != currentTeamData.id && (
+            {currentTeamData && bidDetails.fantateam_id != currentTeamData.id && (
                <BidButtons onBid={onBid} setShowInput={setShowInput} player_id={player_id} currentBid={currentBid} />
             )}
 
