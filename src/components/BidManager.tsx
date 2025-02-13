@@ -3,10 +3,12 @@ import { AuctionCard } from '@/components/AuctionCard';
 import { placeBid, deleteBid } from '@/integrations/supabase/bids';
 import { useAuth } from './AuthProvider';
 import { BidDetail } from '@/integrations/supabase/types';
+import { useTeamData } from '@/queries/useUserData';
 
 export const BidManager = ({ allBids, maxBids, toast }) => {
    const [bids, setBids] = useState<BidDetail[]>(maxBids || []);
    const { user } = useAuth();
+   const { data: teamData } = useTeamData(user?.id);
 
    const handleBid = async (playerId: number, bidAmount: number) => {
       setBids(currentBids =>
@@ -22,7 +24,8 @@ export const BidManager = ({ allBids, maxBids, toast }) => {
       );
 
       try {
-         await placeBid(user.id, playerId, 1, bidAmount);
+         const soldPlayerId = allBids.find(bid => bid.player_id === playerId && bid.fantateam_id === teamData?.id)?.selling_player_id;
+         await placeBid(user.id, playerId, soldPlayerId, bidAmount);
          toast({
             title: 'Offerta effettuata!',
             description: 'La tua offerta è stata registrata con successo.',

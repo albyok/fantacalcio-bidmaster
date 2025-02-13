@@ -20,16 +20,20 @@ export function BidHistoryStatus({ bidHistory }: BidHistoryStatusProps) {
    useEffect(() => {
       if (teamsData) {
          const bidEntry = teamsData.map(team => {
-            const bid = bidHistory.find(bid => bid.fantateam_name === team.name);
-            if (bid) {
+            const bids = bidHistory.filter(bid => bid.fantateam_name === team.name);
+            const highestBid = bids.reduce((max, bid) => (bid.bid_amount > max.bid_amount ? bid : max), {
+               bid_amount: -1,
+               selling_player_id: -1,
+            });
+            if (highestBid.bid_amount !== -1) {
                return {
                   team_name: team.name,
-                  selling_player_id: bid.selling_player_id,
-                  status: bid.bid_amount === -1 ? 'red' : 'green',
-                  bidAmount: bid.bid_amount,
+                  selling_player_id: highestBid.selling_player_id,
+                  status: highestBid.bid_amount === -1 ? 'gray' : 'green',
+                  bidAmount: highestBid.bid_amount,
                };
             } else {
-               return { team_name: team.name, selling_player_id: -1, status: 'gray' };
+               return { team_name: team.name, selling_player_id: -1, status: 'red' };
             }
          });
          setBidEntry(bidEntry);
