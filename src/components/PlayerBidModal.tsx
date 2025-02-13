@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { placeBid } from '@/integrations/supabase/bids';
+import { placeBid, useRemainingBudget } from '@/integrations/supabase/bids';
 import { useAuth } from './AuthProvider';
 import { useToast } from '@/components/ui/use-toast';
 import { Player } from '@/models/player';
-import { leagueConfig } from '@/config/leagueConfig';
 import { usePlayersForFantateam } from '@/queries/usePlayersData';
 import { useTeamData } from '@/queries/useUserData';
 import { PlayerCard } from './PlayerCard';
@@ -21,9 +20,17 @@ export function PlayerBidModal({ isOpen, onClose, player }: PlayerBidModalProps)
    const { toast } = useToast();
    const [bidAmount, setBidAmount] = useState<number>(1);
    const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+   const [localRemainingBudget, setLocalRemainingBudget] = useState<number | undefined>(undefined);
 
    const teamData = useTeamData(user?.id);
    const fantasyTeamPlayers = usePlayersForFantateam(teamData?.data?.id);
+   const { data: remainingBudget } = useRemainingBudget(user?.id);
+
+   useEffect(() => {
+      if (remainingBudget !== undefined) {
+         setLocalRemainingBudget(remainingBudget);
+      }
+   }, [remainingBudget]);
 
    const handleBid = async () => {
       if (!user?.id) {
@@ -60,6 +67,10 @@ export function PlayerBidModal({ isOpen, onClose, player }: PlayerBidModalProps)
 
    const handlePlayerSelect = (player: Player) => {
       setSelectedPlayer(player);
+      if (remainingBudget !== undefined) {
+         const updatedBudget = remainingBudget + Math.floor(player.fantaprice / 2);
+         setLocalRemainingBudget(updatedBudget);
+      }
    };
 
    if (!isOpen) return null;
@@ -77,6 +88,7 @@ export function PlayerBidModal({ isOpen, onClose, player }: PlayerBidModalProps)
                )}
             </div>
             <div>
+               <p>Budget rimanente: {localRemainingBudget !== undefined ? `${localRemainingBudget}M` : 'Caricamento...'}</p>
                <input
                   type="number"
                   value={bidAmount}
@@ -84,6 +96,9 @@ export function PlayerBidModal({ isOpen, onClose, player }: PlayerBidModalProps)
                   className="mt-2 p-2 border rounded max-w-xs"
                   placeholder="Inserisci la tua offerta"
                />
+               <Button variant="default" onClick={handleBid} disabled={!selectedPlayer}>
+                  Offri
+               </Button>
             </div>
             <div className="mt-4">
                <h3>Seleziona un giocatore da vendere</h3>
@@ -113,9 +128,6 @@ export function PlayerBidModal({ isOpen, onClose, player }: PlayerBidModalProps)
             <div className="mt-4 flex justify-end">
                <Button variant="outline" onClick={onClose} className="mr-2">
                   Chiudi
-               </Button>
-               <Button variant="default" onClick={handleBid} disabled={!selectedPlayer}>
-                  Offri
                </Button>
             </div>
          </div>

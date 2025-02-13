@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { processExcelFile } from '@/utils/excelProcessor';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
-import { getRemainingBudget } from '@/integrations/supabase/bids';
+import { useRemainingBudget } from '@/integrations/supabase/bids';
 
 const Header = ({ profile, teamData, isLoading, setIsLoading }) => {
    const { toast } = useToast();
-   const { data: remainingBudget } = getRemainingBudget(profile?.id);
+   const { data: remainingBudget } = useRemainingBudget(profile?.id);
 
    const handleImportClick = () => {
       const input = document.createElement('input');

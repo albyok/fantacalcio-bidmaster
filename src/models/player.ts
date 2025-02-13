@@ -3,8 +3,8 @@ export interface Player {
    name: string;
    team: string;
    role: string;
-   created_at: string;
-   updated_at: string;
+   created_at?: string;
+   updated_at?: string;
    fantasy_team_id: string;
    fantateam: string;
    mantra_role: string;

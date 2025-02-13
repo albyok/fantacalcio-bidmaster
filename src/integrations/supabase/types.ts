@@ -235,7 +235,8 @@ export type Database = {
 
 export interface BidDetail {
    player_id: number;
-   teamName: string;
+   fantateam_name: string;
+   fantateam_id: string;
    bid_amount: number;
    player_name: string;
    player_team: string;

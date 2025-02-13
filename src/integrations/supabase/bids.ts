@@ -66,7 +66,7 @@ export const deleteBid = async (playerId: number) => {
    }
 };
 
-export const getRemainingBudget = (userId: string) => {
+export const useRemainingBudget = (userId: string) => {
    return useQuery({
       queryKey: ['remaining-budget', userId],
       queryFn: async () => {

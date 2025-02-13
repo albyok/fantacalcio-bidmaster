@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AuctionCard } from '@/components/AuctionCard';
-import { placeBid, deleteBid, getWinningBids, getRemainingBudget } from '@/integrations/supabase/bids';
+import { placeBid, deleteBid, getWinningBids, useRemainingBudget } from '@/integrations/supabase/bids';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthProvider';
 import { BidDetail } from '@/integrations/supabase/types';
