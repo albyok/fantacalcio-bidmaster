@@ -7,9 +7,11 @@ import { BidDetail } from '@/integrations/supabase/types';
 import { leagueConfig } from '@/config/leagueConfig';
 import { PlayerCard } from './PlayerCard';
 import { Player } from '@/models/player';
+import { BidHistoryStatus } from './BidHistoryStatus';
 
 interface AuctionCardProps {
    bidDetails: BidDetail;
+   bidHistory: BidDetail[];
    onBid: (playerId: number, bidAmount: number) => void;
    onDelete: (playerId: number) => void;
 }
@@ -27,7 +29,7 @@ function BidButtons({ onBid, setShowInput, player_id, currentBid }) {
    );
 }
 
-export function AuctionCard({ bidDetails, onBid, onDelete }: AuctionCardProps) {
+export function AuctionCard({ bidDetails, bidHistory, onBid, onDelete }: AuctionCardProps) {
    const { player_name, player_team, player_role, player_id, player_mantra_role } = bidDetails;
    const { bid_amount: currentBid } = bidDetails;
    const [showInput, setShowInput] = useState(false);
@@ -78,6 +80,8 @@ export function AuctionCard({ bidDetails, onBid, onDelete }: AuctionCardProps) {
                   <span className="font-medium text-primary">{currentBid}M</span>
                </div>
             </div>
+
+            <BidHistoryStatus bidHistory={bidHistory} />
 
             {currentTeamData && bidDetails.fantateam_id != currentTeamData.id && (
                <BidButtons onBid={onBid} setShowInput={setShowInput} player_id={player_id} currentBid={currentBid} />

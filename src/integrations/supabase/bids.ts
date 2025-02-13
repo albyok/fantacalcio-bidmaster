@@ -14,9 +14,9 @@ export const placeBid = async (userId: string, playerId: number, selling_player_
    }
 };
 
-export const getBids = () => {
+export const getBids = (filterMaxBids = true) => {
    return useQuery({
-      queryKey: ['user-bids'],
+      queryKey: ['user-bids', filterMaxBids],
       queryFn: async () => {
          const { data, error } = await supabase.rpc('get_all_bid_details', {});
 
@@ -25,23 +25,24 @@ export const getBids = () => {
             return [];
          }
 
-         const maxBids = data.reduce((acc, bid) => {
-            if (!acc[bid.player_id] || acc[bid.player_id].bid_amount < bid.bid_amount) {
-               acc[bid.player_id] = bid;
-            }
-            return acc;
-         }, {});
+         if (filterMaxBids) {
+            const maxBids = data.reduce((acc, bid) => {
+               if (!acc[bid.player_id] || acc[bid.player_id].bid_amount < bid.bid_amount) {
+                  acc[bid.player_id] = bid;
+               }
+               return acc;
+            }, {});
 
-         const result = Object.values(maxBids);
+            const result = Object.values(maxBids);
+            return result;
+         }
 
-         console.log('Bid details:', result);
-
-         return result;
+         return data;
       },
    });
 };
 
-export const getWinningBids = (teamUserId: string) => {
+export const getWinningBidsForFantateam = (teamUserId: string) => {
    return useQuery({
       queryKey: ['winning-bids', teamUserId],
       queryFn: async () => {
@@ -78,6 +79,26 @@ export const useRemainingBudget = (userId: string) => {
          }
 
          console.log('Remaining budget:', data);
+         return data;
+      },
+   });
+};
+
+export const getBidHistoryForPlayer = (playerId: number) => {
+   return useQuery({
+      queryKey: ['bid-history', playerId],
+      queryFn: async () => {
+         const { data, error } = await supabase
+            .from('bids')
+            .select('*')
+            .eq('player_id', playerId)
+            .order('created_at', { ascending: false });
+
+         if (error) {
+            console.error('Error fetching bid history:', error);
+            return [];
+         }
+
          return data;
       },
    });
