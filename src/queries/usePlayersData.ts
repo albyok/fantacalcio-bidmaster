@@ -19,3 +19,28 @@ export const usePlayersForFantateam = (teamId: string) => {
 
    return queryResult.data ?? [];
 };
+
+export const usePlayerById = (playerId: number): Player | undefined => {
+   const { players } = useAllPlayers();
+   return players?.find(player => player.player_id === playerId);
+};
+
+export const useAllPlayers = () => {
+   const queryResult = useQuery({
+      queryKey: ['players'],
+      queryFn: async () => {
+         const { data, error } = await supabase.from('players').select(`
+          *,
+          fantasy_team:teams(name)
+        `);
+
+         if (error) throw error;
+         return data;
+      },
+   });
+
+   return {
+      players: queryResult.data,
+      isLoading: queryResult.isLoading,
+   };
+};

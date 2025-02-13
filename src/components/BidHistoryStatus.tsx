@@ -4,6 +4,9 @@ import { useFantateams } from '@/queries/useTeams';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Icon from '@mdi/react';
 import { mdiExitRun } from '@mdi/js';
+import { HoverCard, HoverCardTrigger, HoverCardContent } from '@radix-ui/react-hover-card';
+import { PlayerCard } from './PlayerCard';
+import { useAllPlayers, usePlayerById } from '@/queries/usePlayersData';
 
 interface BidHistoryStatusProps {
    bidHistory: BidDetail[];
@@ -11,56 +14,72 @@ interface BidHistoryStatusProps {
 
 export function BidHistoryStatus({ bidHistory }: BidHistoryStatusProps) {
    const { data: teamsData } = useFantateams();
-   const [teamsStatus, setTeamsStatus] = useState<{ name: string; status: string; bidAmount?: number }[]>([]);
+   const [bidEntry, setBidEntry] = useState<{ team_name: string; selling_player_id: number; status: string; bidAmount?: number }[]>([]);
+   const allPlayers = useAllPlayers();
 
    useEffect(() => {
       if (teamsData) {
-         const teamsStatus = teamsData.map(team => {
+         const bidEntry = teamsData.map(team => {
             const bid = bidHistory.find(bid => bid.fantateam_name === team.name);
             if (bid) {
-               return { name: team.name, status: bid.bid_amount === -1 ? 'red' : 'green', bidAmount: bid.bid_amount };
+               return {
+                  team_name: team.name,
+                  selling_player_id: bid.selling_player_id,
+                  status: bid.bid_amount === -1 ? 'red' : 'green',
+                  bidAmount: bid.bid_amount,
+               };
             } else {
-               return { name: team.name, status: 'gray' };
+               return { team_name: team.name, selling_player_id: -1, status: 'gray' };
             }
          });
-         setTeamsStatus(teamsStatus);
+         setBidEntry(bidEntry);
       }
    }, [bidHistory, teamsData]);
 
    return (
       <div className="p-4 flex justify-center">
          <ul className="list-none flex space-x-2">
-            {teamsStatus.map(team => (
-               <li key={team.name} className="relative group">
-                  <Avatar
-                     className={`w-9 h-9 border-2 rounded-full ${
-                        team.status === 'green' ? 'border-green-500' : team.status === 'red' ? 'border-red-500' : 'border-gray-500'
-                     }`}
-                  >
-                     <AvatarImage src={`/path/to/avatar/${team.name}.png`} alt={team.name} />
-                     <AvatarFallback>
-                        {team.name
-                           .split(' ')
-                           .map(word => word.charAt(0))
-                           .join('')}
-                     </AvatarFallback>
-                  </Avatar>
-                  {team.bidAmount !== undefined ? (
-                     team.bidAmount === -1 ? (
-                        <div className="flex justify-center text-xs mt-1 select-none">
-                           <Icon path={mdiExitRun} size={1} />
-                        </div>
+            {bidEntry.map(bid => {
+               const soldPlayer = allPlayers.players?.find(player => player.player_id === bid.selling_player_id);
+               return (
+                  <li key={bid.team_name} className="relative group">
+                     <HoverCard>
+                        <HoverCardTrigger asChild>
+                           <Avatar
+                              className={`w-9 h-9 border-2 rounded-full select-none ${
+                                 bid.status === 'green' ? 'border-green-500' : bid.status === 'red' ? 'border-red-500' : 'border-gray-500'
+                              }`}
+                           >
+                              <AvatarImage src={`/path/to/avatar/${bid.team_name}.png`} alt={bid.team_name} />
+                              <AvatarFallback>
+                                 {bid.team_name
+                                    .split(' ')
+                                    .map(word => word.charAt(0))
+                                    .join('')}
+                              </AvatarFallback>
+                           </Avatar>
+                        </HoverCardTrigger>
+                        <HoverCardContent
+                           className="bg-white text-black text-xs rounded p-1 select-none shadow-lg"
+                           style={{ width: 'max-content', whiteSpace: 'nowrap', zIndex: 10 }}
+                        >
+                           {soldPlayer && <PlayerCard player={soldPlayer} />}
+                        </HoverCardContent>
+                     </HoverCard>
+                     {bid.bidAmount !== undefined ? (
+                        bid.bidAmount === -1 ? (
+                           <div className="flex justify-center text-xs mt-1 select-none">
+                              <Icon path={mdiExitRun} size={1} />
+                           </div>
+                        ) : (
+                           <div className="text-center text-xs mt-1 select-none">{bid.bidAmount}</div>
+                        )
                      ) : (
-                        <div className="text-center text-xs mt-1 select-none">{team.bidAmount}</div>
-                     )
-                  ) : (
-                     <div className="text-center text-xs mt-1">-</div>
-                  )}
-                  <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-100 bg-black text-white text-xs rounded p-1 select-none">
-                     {team.name}
-                  </span>
-               </li>
-            ))}
+                        <div className="text-center text-xs mt-1">-</div>
+                     )}
+                  </li>
+               );
+            })}
          </ul>
       </div>
    );

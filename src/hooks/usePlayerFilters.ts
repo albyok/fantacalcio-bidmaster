@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { leagueConfig } from '@/config/leagueConfig';
+import { useAllPlayers } from '@/queries/usePlayersData';
 
 type SortConfig = {
    column: string;
@@ -17,18 +18,7 @@ export const usePlayerFilters = () => {
    });
    const [showPurchasable, setShowPurchasable] = useState(false);
 
-   const { data: players, isLoading } = useQuery({
-      queryKey: ['players'],
-      queryFn: async () => {
-         const { data, error } = await supabase.from('players').select(`
-          *,
-          fantasy_team:teams(name)
-        `);
-
-         if (error) throw error;
-         return data;
-      },
-   });
+   const { players, isLoading } = useAllPlayers();
 
    const handleSort = (column: string) => {
       setSortConfig(current => ({

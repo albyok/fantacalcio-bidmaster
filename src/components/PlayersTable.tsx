@@ -39,8 +39,6 @@ const renderTableCell = (player: any, column: any) => {
 };
 
 export function PlayersTable() {
-   const { toast } = useToast();
-   const { user } = useAuth();
    const {
       filteredAndSortedPlayers,
       isLoading,
